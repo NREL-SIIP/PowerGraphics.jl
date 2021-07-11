@@ -70,6 +70,7 @@ VARIABLE_TYPES = ["P", "Spin", "Reg", "Flex"]
 SUPPORTEDVARPREFIX = ["P__", "Pout__"]
 SUPPORTEDPARAMPREFIX = "P_"
 CURTAILMENTPARAMPREFIX = "P__max_active_power__"
+CURTAILMENTPARAMP_END= "_max_active_power"
 
 SUPPORTEDLOADPARAMS = ["PowerLoad", "InterruptibleLoad"]
 
@@ -93,8 +94,8 @@ SLACKVARS = Dict(
     UNSERVEDENERGY_VARIABLE => "Unserved Energy",
 )
 
-LOAD_PARAMETER = :P__max_active_power__PowerLoad
-ILOAD_PARAMETER = :P__max_active_power__InterruptibleLoad
+LOAD_PARAMETER = :P__max_active_power__PowerLoad_max_active_power
+ILOAD_PARAMETER = :P__max_active_power__InterruptibleLoad_max_active_power
 ILOAD_VARIABLE = :P__InterruptibleLoad
 
 GENERATOR_MAPPING_FILE = joinpath(

@@ -65,7 +65,7 @@ function get_generation_parameter_names(
     for name in names
         name_string = string(name)
         if any(startswith.(name_string, SUPPORTEDPARAMPREFIX))
-            if any(endswith.(name_string, all_subtypes(PSY.Generator)))
+            if any(occursin.(all_subtypes(PSY.Generator), name_string))
                 push!(filter_names, name)
             end
         end
@@ -84,7 +84,7 @@ function get_load_variable_names(
     for name in names
         name_string = string(name)
         if any(startswith.(name_string, SUPPORTEDVARPREFIX))
-            if any(endswith.(name_string, SUPPORTEDLOADPARAMS))
+            if any(occursin.(SUPPORTEDLOADPARAMS, name_string))
                 push!(filter_names, name)
             end
         end
@@ -102,7 +102,7 @@ function get_load_parameter_names(
     for name in names
         name_string = string(name)
         if any(startswith.(name_string, SUPPORTEDPARAMPREFIX))
-            if any(endswith.(name_string, SUPPORTEDLOADPARAMS))
+            if any(occursin.(SUPPORTEDLOADPARAMS, name_string))
                 push!(filter_names, name)
             end
         end
@@ -153,7 +153,12 @@ function _get_matching_param(var_name)
 end
 
 function _get_matching_var(param_name)
-    var_name = Symbol(join(["P", split(string(param_name), "_")[end]], PSI_NAME_DELIMITER))
+    var_name = Symbol(
+        join(
+            ["P", split(split(string(param_name), "__")[end], "_")[1]],
+            PSI_NAME_DELIMITER,
+        ),
+    )
     return var_name
 end
 
@@ -168,7 +173,7 @@ function add_fixed_parameters!(
     for (param_name, param) in parameters
         var_name = _get_matching_var(param_name)
         if !haskey(variables, var_name)
-            mult = any(endswith.(string(param_name), NEGATIVE_PARAMETERS)) ? -1.0 : 1.0
+            mult = any(occursin.(NEGATIVE_PARAMETERS, string(param_name))) ? -1.0 : 1.0
             variables[var_name] = param
             variables[var_name][:, propertynames(param) .!== :DateTime] .*= mult
         end
@@ -181,7 +186,7 @@ function _curtailment_parameters(parameters::Vector{Symbol}, variables::Vector{S
         Vector{NamedTuple{(:parameter, :variable), Tuple{Symbol, Symbol}}}()
     for var in variables
         var_param = Symbol(
-            join([CURTAILMENTPARAMPREFIX, split(string(var), PSI_NAME_DELIMITER)[end]]),
+            join([CURTAILMENTPARAMPREFIX, split(string(var), PSI_NAME_DELIMITER)[end]]) * CURTAILMENTPARAMP_END,
         )
         if var_param in parameters
             push!(curtailment_parameters, (parameter = var_param, variable = var))
